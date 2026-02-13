@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Search, Moon, Sun, Menu, X } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import Sidebar from '../components/Sidebar';
@@ -12,6 +12,11 @@ const Dashboard = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedTool, setSelectedTool] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Close tool panel when category changes
+  useEffect(() => {
+    setSelectedTool(null);
+  }, [selectedCategory]);
 
   const filteredTools = useMemo(() => {
     let tools = [];
@@ -53,7 +58,6 @@ const Dashboard = () => {
           </div>
           
           <div className="search-container">
-            <Search className="search-icon" size={20} />
             <input
               type="text"
               placeholder="Search tools..."
