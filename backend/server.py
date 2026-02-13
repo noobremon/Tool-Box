@@ -1,6 +1,5 @@
 from fastapi import FastAPI, APIRouter, HTTPException, UploadFile, File
-from fastapi.responses import StreamingResponse, FileResponse
-from fastapi.staticfiles import StaticFiles
+from fastapi.responses import StreamingResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -777,24 +776,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Serve React static files
-FRONTEND_BUILD = Path(__file__).parent.parent / "frontend" / "build"
-if FRONTEND_BUILD.exists():
-    app.mount("/static", StaticFiles(directory=str(FRONTEND_BUILD / "static")), name="static")
-    
-    @app.get("/{full_path:path}")
-    async def serve_react_app(full_path: str):
-        # Don't serve React app for API routes
-        if full_path.startswith("api/"):
-            raise HTTPException(status_code=404, detail="Not found")
-        
-        file_path = FRONTEND_BUILD / full_path
-        if file_path.is_file():
-            return FileResponse(file_path)
-        # Serve index.html for all other routes (React Router)
-        return FileResponse(FRONTEND_BUILD / "index.html")
+@app.get("/")
+async def root():
+    return {
+        "message": "ToolBox API is running",
+        "version": "1.0",
+        "docs": "/docs"
+    }
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
     if client:
+        client.close()
+
         client.close()

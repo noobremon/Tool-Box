@@ -1,6 +1,6 @@
 #!/bin/bash
+set -e
 
-# Build script for Render deployment
 echo "Building frontend..."
 cd frontend
 npm install
